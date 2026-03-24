@@ -23,7 +23,7 @@ const myFormat = printf((info: TransformableInfo) => {
 
 const logger = createLogger({
   level:  "info",
-  format: combine(label({ label: "Mynder" }), timestamp(), myFormat),
+  format: combine(label({ label: "Task Management" }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
@@ -37,7 +37,7 @@ const logger = createLogger({
 
 const errorLogger = createLogger({
   level:  "error",
-  format: combine(label({ label: "Mynder" }), timestamp(), myFormat),
+  format: combine(label({ label: "Task Management" }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
