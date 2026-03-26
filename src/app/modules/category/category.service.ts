@@ -40,7 +40,7 @@ const getAllCategories = async (query: Record<string, unknown>) => {
 };
 
 const getCategoryBySlug = async (slug: string) => {
-  const getCat = Category.find({
+  const getCat =  await Category.find({
     slug,
   });
 
