@@ -1,12 +1,15 @@
 import { StatusCodes } from "http-status-codes";
 import { Category } from "./category.model";
-import { CategoryValidation, TCreateCategoryPayload } from "./category.validation";
+import {
+  CategoryValidation,
+  TCreateCategoryPayload,
+  TUpdateCategory,
+} from "./category.validation";
 import ApiError from "../../../errors/ApiErrors";
-
 
 const createCategory = async (
   payload: TCreateCategoryPayload,
-  userId: string
+  userId: string,
 ) => {
   const existing = await Category.findOne({ name: payload.name });
 
@@ -24,53 +27,96 @@ const createCategory = async (
   return category;
 };
 
+const getAllCategories = async (query: Record<string, unknown>) => {
+  const filter: Record<string, unknown> = { isActive: true };
+
+  if (query.search) {
+    filter.$or = [{ name: { $regex: query.search, $options: "i" } }];
+  }
+
+  const categories = Category.find(filter);
+
+  return categories;
+};
+
+const getCategoryBySlug = async (slug: string) => {
+  const getCat = Category.find({
+    slug,
+  });
+
+  if (!slug) {
+    throw new ApiError(404, "Slug Not Found");
+  }
+
+  return getCat;
+};
+
+const updateCategory = async (categoryId: string, payload: TUpdateCategory) => {
+  const category = await Category.findByIdAndUpdate(categoryId, {
+    $set: payload,
+  }, 
+{returnDocument: 'after', runValidators: true} 
+);
+
+  if (!category) {
+    throw new ApiError(404, "Category Not Found");
+  }
+
+  return category;
+};
 
 
+const toggleCategory = async (categoryId: string) => {
 
-const getAllCategories = async (query:Record<string, unknown>) => {
+  const cat = await Category.findById(
+    categoryId,
+  
+  )
+  if(!cat) {
+    throw new ApiError(404, "Category Not Found")
+  }
 
+  cat.isActive = !cat.isActive
 
-    const filter:Record<string, unknown> = {isActive: true}
+  cat.save()
 
-    if(query.search) {
-        filter.$or = [ { name: {$regex: query.search, $options: "i"} } ]
-    }
-
-
-
-    const categories = Category.find(filter)
-
-    return categories
-
-
-
-
-
-
+  return cat
 
 
 }
 
 
-
-const getCategoryBySlug = async(slug:string) => {
-
-    const getCat = Category.find({
-        slug
-    })
-
-    if(!slug) {
-        throw new ApiError(404, "Slug Not Found")
-    }
+const getCategoryWithTaskCount = async () => {
 
 
-return getCat
+  const cat = await Category.aggregate([
+    {$lookup: {
+      from: "tasks",
+      localField: "_id",
+      foreignField: "category",
+      as: "categoryTasks"
+    }}, 
+
+{
+  $addFields: {
+    taskCount: {$size: "$categoryTasks"}
+  }},
+
+  {$project: {
+    categoryTasks: 0
+  }},
+
+  ])
+return cat
 
 }
 
 
-export const CategoryService= {
-    createCategory,
-    getAllCategories,
-    getCategoryBySlug
-}
+export const CategoryService = {
+  createCategory,
+  getAllCategories,
+  getCategoryBySlug,
+  updateCategory,
+  toggleCategory,
+  getCategoryWithTaskCount
+};

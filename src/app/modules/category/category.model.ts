@@ -50,6 +50,46 @@ categorySchema.pre("validate", async function () {
 });
 
 
+categorySchema.pre("findOneAndUpdate", async function () {
+  const update = this.getUpdate() as any;
+
+  
+  const newName = update.name || (update.$set && update.$set.name);
+
+  if (newName) {
+    const baseSlug = newName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    let slug = baseSlug;
+    let counter = 1;
+
+  
+    const currentId = this.getQuery()._id;
+
+  
+    while (
+      await mongoose.models.Category.findOne({
+        slug,
+        _id: { $ne: currentId } 
+      })
+    ) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+   
+    if (update.$set) {
+      update.$set.slug = slug;
+    } else {
+      update.slug = slug;
+    }
+    
+    this.setUpdate(update);
+  }
+});
 //  POST HOOK
 categorySchema.post("save", function (doc) {
   console.log(`Category cache invalidated: ${doc.slug}`);
