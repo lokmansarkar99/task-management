@@ -36,9 +36,9 @@ async function main() {
 
     initSocket(httpServer);
 
-    // Step 3: httpServer.listen()  ─────────────────
+    // Step 3: httpServer.listen()  
     server = httpServer.listen(port, () => {
-      logger.info(colors.green(`🚀 Server running on port ${port}`));
+      logger.info(colors.green(` Server running on port ${port}`));
       logger.info(colors.cyan(`🔌 Socket.IO ready → ws://localhost:${port}`)); 
     });
 
@@ -51,7 +51,7 @@ async function main() {
 
 main();
 
-// ─── Unhandled Rejection Handler — Asynchronous Errors ───────────────────────
+// Unhandled Rejection Handler — Asynchronous Errors 
 process.on('unhandledRejection', (err) => {
   if (server) {
     server.close(() => {
@@ -64,7 +64,7 @@ process.on('unhandledRejection', (err) => {
   }
 });
 
-// ─── SIGINT Handler — Graceful Shutdown ──────────────────────────────────────
+//  SIGINT Handler — Graceful Shutdown 
 process.on('SIGINT', () => {
   logger.info(colors.yellow('SIGTERM received. Shutting down gracefully...'));
   if (server) server.close();

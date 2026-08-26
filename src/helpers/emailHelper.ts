@@ -21,9 +21,9 @@ const sendEmail = async (values: ISendEmail): Promise<void> => {
       subject: values.subject,
       html:    values.html,
     });
-    logger.info('✅ Mail sent successfully', info.accepted);
+    logger.info(' Mail sent successfully', info.accepted);
   } catch (error) {
-    errorLogger.error('❌ Email send failed:', error);
+    errorLogger.error(' Email send failed:', error);
   }
 };
 

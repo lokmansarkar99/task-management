@@ -12,14 +12,14 @@ import passport     from './config/passport';
 
 const app: Application = express();
 
-// ─── Logger ───────────────────────────────────────────────────────────────────
+// Logger 
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
-// ─── Rate Limiter ─────────────────────────────────────────────────────────────
+// Rate Limiter 
 app.use(globalRateLimiter);
 
-// ─── CORS ─────────────────────────────────────────────────────────────────────
+//  CORS
 // Updated to array to support multiple origins 
 app.use(
   cors({
@@ -32,7 +32,7 @@ app.use(
   }),
 );
 
-// ─── Stripe Webhook ───────────────────────────────────────────────────────────
+// Stripe Webhook
 // MUST be before express.json() — Stripe needs raw body
 // app.post(
 //   '/api/v1/stripe/webhook',
@@ -40,29 +40,29 @@ app.use(
 //   StripeController.handleWebhook,
 // );
 
-// ─── Parsers ──────────────────────────────────────────────────────────────────
+//Parsers
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Passport ─────────────────────────────────────────────────────────────────
+// Passport 
 app.use(passport.initialize());
 
-// ─── Static Files ─────────────────────────────────────────────────────────────
+//  Static Files 
 app.use('/api/v1/uploads', express.static('uploads'));
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+// Health Check 
 app.get('/', (_req: Request, res: Response) => {
   res.status(StatusCodes.OK).json({
     success: true,
-    message: 'Mynder API Server is running 🚀',
+    message: 'Task Manager API Server is running ',
   });
 });
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
+//  API Routes
 app.use('/api/v1', router);
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
+//  404 Handler 
 app.use((req: Request, res: Response) => {
   res.status(StatusCodes.NOT_FOUND).json({
     success: false,
@@ -71,7 +71,7 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
+// Global Error Handler 
 app.use(globalErrorHandler);
 
 export default app;

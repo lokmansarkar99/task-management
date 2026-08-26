@@ -1,10 +1,16 @@
 import { Types } from "mongoose";
 import ApiError from "../../../errors/ApiErrors";
 import { Task } from "./task.model";
-import { TBulkUpdateStatus, TCreateTaskPayload, TUpdateTaskPayload, TUpdateTaskStatus } from "./task.validation";
+import {
+  TBulkUpdateStatus,
+  TCreateTaskPayload,
+  TUpdateTaskPayload,
+  TUpdateTaskStatus,
+} from "./task.validation";
 
 import { USER_ROLES } from "../../../enums/user";
 import { TASK_STATUS } from "../../../enums/task";
+import { QueryBuilder } from "../../buillder/queryBuilder";
 
 const createTask = async (payload: TCreateTaskPayload, userId: string) => {
   const createTask = await Task.create({
@@ -15,129 +21,215 @@ const createTask = async (payload: TCreateTaskPayload, userId: string) => {
   return createTask;
 };
 
-const updateTask = async (payload: TUpdateTaskPayload, taskId: string, userId:string) => {
+const updateTask = async (
+  payload: TUpdateTaskPayload,
+  taskId: string,
+  userId: string,
+) => {
   const isExistTask = await Task.findById(taskId);
-
-
-
 
   if (!isExistTask) {
     throw new ApiError(404, "Task Not Found");
   }
 
-const isOwner = await Task.findOne({_id: taskId, createdBy: userId})
+  const isOwner = await Task.findOne({ _id: taskId, createdBy: userId });
 
+  if (!isOwner) {
+    throw new ApiError(
+      403,
+      "Forbidden, You are not permitted for edit this task.",
+    );
+  }
 
-if(!isOwner) {
-    throw new ApiError (403, "Forbidden, You are not permitted for edit this task.")
-}
+  const updatedTask = await Task.findByIdAndUpdate(
+    taskId,
+    { $set: payload },
+    { returnDocument: "after" },
+  );
 
-
-const updatedTask = await Task.findByIdAndUpdate(
-     taskId,
-     {$set: payload}, 
-     { returnDocument: "after"}
-    )
-
-    return updatedTask
-
+  return updatedTask;
 };
 
-const getAllTasks = async (query: Record<string, unknown>, userID: string, userRole: string) => {
-// Base Filter 
-const filter: Record<string, unknown> = { isDeleted: false}
-if(userRole !== USER_ROLES.ADMIN) {
-    filter.createdBy = userID
-}
-// Dynamic Filter
-// status filter (simple $eq)
+// const getAllTasks = async (
+//   query: Record<string, unknown>,
+//   userID: string,
+//   userRole: string,
+// ) => {
+//   // Base Filter
+//   const filter: Record<string, unknown> = { isDeleted: false };
+//   if (userRole !== USER_ROLES.ADMIN) {
+//     filter.createdBy = userID;
+//   }
+//   // Dynamic Filter
+//   // status filter (simple $eq)
 
-if(query.status ) {
-    filter.status = query.status 
-}
+//   if (query.status) {
+//     filter.status = query.status;
+//   }
 
-// priority filter
+//   // priority filter
 
-if(query.priority ) {
-    filter.priority = query.priority
-}
-// tags filter ($in)
-if(query.tags) {
-    const tagsArr = (query.tags as string).split(",") 
-    filter.tags = {$in : tagsArr}
-}
+//   if (query.priority) {
+//     filter.priority = query.priority;
+//   }
+//   // tags filter ($in)
+//   if (query.tags) {
+//     const tagsArr = (query.tags as string).split(",");
+//     filter.tags = { $in: tagsArr };
+//   }
 
-// category filter
-if(query.category) {
-    filter.category = query.category
-}
+//   // category filter
+//   if (query.category) {
+//     filter.category = query.category;
+//   }
 
-// date range ($lte / $gte)
-if(query.dueBefore || query.dueAfter) {
-    filter.dueDate = {}
+//   // date range ($lte / $gte)
+//   if (query.dueBefore || query.dueAfter) {
+//     filter.dueDate = {};
 
-    if(query.dueBefore) { (filter.dueDate as any).$lte = new Date(query.dueBefore as string)}
+//     if (query.dueBefore) {
+//       (filter.dueDate as any).$lte = new Date(query.dueBefore as string);
+//     }
 
-    if(query.dueAfter) { (filter.dueDate as any).$gte = new Date(query.dueAfter as string)}
+//     if (query.dueAfter) {
+//       (filter.dueDate as any).$gte = new Date(query.dueAfter as string);
+//     }
+//   }
 
-}
+//   // scheduled only ($exists)
 
+//   if (query.scheduledOnly === "true") {
+//     filter.scheduledAt = { $exists: true };
+//   }
 
-// scheduled only ($exists)
+//   // exclude specific user ($ne)
+//   if (query.excludeUser) {
+//     filter.createdBy = { $ne: query.excludeUser };
+//   }
 
-if(query.scheduledOnly === "true") {
-    filter.scheduledAt = {$exists: true}
-}
+//   // active task only ($or)
 
-// exclude specific user ($ne)
-if(query.excludeUser) {
-    filter.createdBy = {$ne: query.excludeUser}
-}
+//   if (query.activeOnly === "true") {
+//     filter.$or = [
+//       { status: TASK_STATUS.TODO },
+//       { status: TASK_STATUS.IN_PROGRESS },
+//     ];
+//   }
 
+//   // text search ($regex)
 
-// active task only ($or) 
+//   if (query.search) {
+//     filter.$or = [
+//       { title: { $regex: query.search, $options: "i" } },
+//       { description: { $regex: query.search, $options: "i" } },
+//     ];
+//   }
 
-if(query.activeOnly === "true")  {
-    filter.$or = [ {status: TASK_STATUS.TODO}, {status: TASK_STATUS.IN_PROGRESS}]
-}
+//   // Pagination
 
-// text search ($regex)
+//   const page = Number(query.page) || 1;
+//   const limit = Number(query.limit) || 10;
+//   const skip = (page - 1) * limit;
 
-if(query.search) {
-    filter.$or = [
-        { title: {$regex: query.search , $options: "i"}},
-        {description: {$regex: query.search, $options: "i"}}
-    ]
-}
+//   // Sort
 
+//   const sortBy: string = (query.sortBy as string) || "createdAt";
+//   const sortOrder: 1 | -1 = query.sortOrder === "asc" ? 1 : -1;
 
-// Pagination 
+//   const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder };
 
-const page = Number(query.page) || 1
-const limit = Number(query.limit) || 10
-const skip = (page - 1) * limit
+//   // Query
+//   const [tasks, total] = await Promise.all([
+//     Task.find(filter).sort(sort).skip(skip).limit(limit),
+//     Task.countDocuments(filter),
+//   ]);
 
-// Sort
+//   return {
+//     tasks,
+//     meta: { page, limit, total, totalPges: Math.ceil(total / limit) },
+//   };
+// };
 
-const sortBy: string = (query.sortBy as string) || "createdAt"
-const sortOrder: 1 | -1 = query.sortOrder === "asc" ? 1 : -1
+// refactor getAllTasks with QueryBuilder
 
-const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder }
+const getAllTasks = async (
+  query: Record<string, unknown>,
+  userID: string,
+  userRole: string,
+) => {
+  // Base filter
+  const filter: Record<string, unknown> = {
+    isDeleted: false,
+  };
+  // Non admin can see only own task
+  if (userRole !== USER_ROLES.ADMIN) {
+    filter.createdBy = userID;
+  }
 
+  // custom keys differntiate
+  const {
+    tags,
+    dueBefore,
+    dueAfter,
+    scheduledOnly,
+    excludeUser,
+    activeOnly,
+    ...restQuery
+  } = query as Record<string, string | undefined>;
 
+  // queryBuildr chain
+  const taskQuery = new QueryBuilder(Task.find(filter), restQuery)
+    .search(["title", "description"])
+    .filter()
+    .sort()
+    .paginate();
 
-// Query
-const [tasks, total] = await Promise.all([
-    Task.find(filter).sort(sort).skip(skip).limit(limit),
-    Task.countDocuments(filter)
-])
+  // tags filter ($in)
+  if (tags) {
+    const tagsArr = tags.split(",");
+    taskQuery.modelQuery = taskQuery.modelQuery.find({
+      tags: { $in: tagsArr },
+    });
+  }
 
-return { 
-    tasks,
-    meta: { page, limit, total, totalPges: Math.ceil(total / limit)}
-}
+  // dueDate range ($lte / $gte) — dateRange()
+  if (dueBefore || dueAfter) {
+    const dueDateFilter: Record<string, Date> = {};
+    if (dueBefore) dueDateFilter.$lte = new Date(dueBefore);
+    if (dueAfter) dueDateFilter.$gte = new Date(dueAfter);
+    taskQuery.modelQuery = taskQuery.modelQuery.find({
+      dueDate: dueDateFilter,
+    });
+  }
 
+  // scheduled only ($exists)
+  if (scheduledOnly === "true") {
+    taskQuery.modelQuery = taskQuery.modelQuery.find({
+      scheduledAt: { $exists: true },
+    });
+  }
 
+  // exclude specific user ($ne)
+  if (excludeUser) {
+    taskQuery.modelQuery = taskQuery.modelQuery.find({
+      createdBy: { $ne: excludeUser },
+    });
+  }
+
+  // active task only ($or)
+  if (activeOnly === "true") {
+    taskQuery.modelQuery = taskQuery.modelQuery.find({
+      $or: [{ status: TASK_STATUS.TODO }, { status: TASK_STATUS.IN_PROGRESS }],
+    });
+  }
+  // Execute + Meta (parallel)
+
+  const [tasks, meta] = await Promise.all([
+    taskQuery.modelQuery,
+    taskQuery.countTotal(),
+  ]);
+
+  return { data: tasks, meta };
 };
 
 const deleteTask = async (taskId: string, userId: string) => {
@@ -147,103 +239,92 @@ const deleteTask = async (taskId: string, userId: string) => {
     throw new ApiError(404, "Task Not Found");
   }
 
-  const isOwner = await Task.findOne({_id: taskId, createdBy: userId})
+  const isOwner = await Task.findOne({ _id: taskId, createdBy: userId });
 
-  if(!isOwner) {
-    throw new ApiError(403, "Forbidden")
+  if (!isOwner) {
+    throw new ApiError(403, "Forbidden");
   }
 
-  const deleteTask = await Task.findByIdAndUpdate(taskId, {isDeleted: true} , {new: true})
+  const deleteTask = await Task.findByIdAndUpdate(
+    taskId,
+    { isDeleted: true },
+    { new: true },
+  );
 
   return deleteTask;
 };
 
-
 const getSingleTask = async (taskId: string) => {
+  const task = await Task.findById(taskId).populate(
+    "createdBy",
+    "name email profileImage",
+  );
 
+  if (!task) {
+    throw new ApiError(404, "Task Not Found");
+  }
 
-const task = await Task.findById(taskId).populate('createdBy' ,'name email profileImage')
+  if (task.isDeleted) {
+    throw new ApiError(400, "Task has deleted");
+  }
+  await Task.updateOne({ _id: taskId }, { $inc: { viewCount: 1 } });
 
-if(!task) {
-    throw new ApiError(404, "Task Not Found")
+  return task;
+};
 
-}
+const updateTaskStatus = async (
+  taskId: string,
+  userId: string,
+  payload: TUpdateTaskStatus,
+) => {
+  const ups = await Task.findOneAndUpdate(
+    {
+      _id: taskId,
+      createdBy: userId,
+      isDeleted: false,
+    },
+    payload.status === TASK_STATUS.DONE
+      ? { $set: { status: payload.status, completedAt: new Date() } }
+      : { $set: { status: payload.status } },
 
-if(task.isDeleted) {
-    throw new ApiError(400, "Task has deleted")
-}
-await Task.updateOne({_id: taskId}, {$inc: {viewCount: 1}} )
+    { runValidators: true, returnDocument: "after" },
+  );
 
+  return ups;
+};
 
-return task
+const bulkUpdateStatus = async (payload: TBulkUpdateStatus, userId: string) => {
+  const updatedTasks = await Task.updateMany(
+    { _id: { $in: payload.taskIds }, createdBy: userId, isDeleted: false },
+    { $set: { status: payload.newStatus } },
+  );
 
-
-}
-
-const updateTaskStatus = async (taskId: string, userId: string, payload: TUpdateTaskStatus) => {
-
-    const ups = await Task.findOneAndUpdate({
-        _id: taskId, createdBy: userId, isDeleted: false },
-        payload.status === TASK_STATUS.DONE ? { $set: {status: payload.status, completedAt: new Date ()}} : {$set: { status: payload.status}},
-
-        {runValidators: true, returnDocument: 'after'}    )
-
-        return ups;
-    
-
-} 
-
-
-
-const bulkUpdateStatus = async (payload:TBulkUpdateStatus, userId:string) => {
-
-    const updatedTasks =  await Task.updateMany(
-        {_id: {$in: payload.taskIds}, createdBy: userId, isDeleted: false},
-        {$set: {status: payload.newStatus}},
-        
-        
-        
-    )
-
-return updatedTasks.modifiedCount
-
-
-}
-
-
-
+  return updatedTasks.modifiedCount;
+};
 
 const getScheduledTasks = async () => {
-// scheduled tasks 
-    const gs = await Task.find({
-        status: TASK_STATUS.SCHEDULED,
-        scheduledAt: {$lte: new Date()},
-        isDeleted: false
-    })
+  // scheduled tasks
+  const gs = await Task.find({
+    status: TASK_STATUS.SCHEDULED,
+    scheduledAt: { $lte: new Date() },
+    isDeleted: false,
+  });
 
-
-    return gs    
-
-}
+  return gs;
+};
 
 const getOverDueTasks = async (userId: string) => {
+  const ot = await Task.find({
+    createdBy: userId,
+    dueDate: { $lt: new Date() },
+    status: { $nin: [TASK_STATUS.DONE, TASK_STATUS.CANCELLED] },
+    isDeleted: false,
+  })
+    .sort({ dueDate: 1 })
+    .lean();
 
-    const ot = await Task.find({
-            createdBy: userId,
-            dueDate: {$lt: new Date()},
-            status: {$nin: [TASK_STATUS.DONE, TASK_STATUS.CANCELLED]},
-            isDeleted: false
-    })
-    .sort({dueDate: 1}).lean()
-
-    return ot
-}
-
-
-
-
-
-
+  return ot;
+};
 
 export const TaskService = {
   createTask,
@@ -251,8 +332,8 @@ export const TaskService = {
   getAllTasks,
   deleteTask,
   getSingleTask,
-  updateTaskStatus, 
+  updateTaskStatus,
   bulkUpdateStatus,
   getScheduledTasks,
-  getOverDueTasks
+  getOverDueTasks,
 };

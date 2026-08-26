@@ -6,13 +6,14 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { Task } from "./task.model";
 import { TASK_STATUS } from "../../../enums/task";
+import { ITask } from "./task.interface";
 
 
 const createTask = catchAsync(async (req:Request, res:Response) => {
 
     const result = await TaskService.createTask(req.body, req.user!.id as string )
 
-    sendResponse(res , {
+    sendResponse<ITask>(res , {
         success: true,
         statusCode: StatusCodes.CREATED,
         message: "Task Created Successfully",
@@ -44,7 +45,8 @@ const getAllTasks = catchAsync(async (req:Request , res:Response) => {
         success: true,
         statusCode: StatusCodes.OK,
         message: "All tasks retrived successfully", 
-        data: result
+        data: result.data,
+        meta: result.meta
     })
 })
 

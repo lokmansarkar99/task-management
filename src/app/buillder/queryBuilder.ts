@@ -30,7 +30,7 @@ export class QueryBuilder<T> {
         $or: searchableFields.map(field => ({
           [field]: { $regex: searchTerm, $options: 'i' },
         })),
-      } as any);   // ✅ 'as any' — avoids FilterQuery import issue
+      } as any);   //  'as any' — avoids FilterQuery import issue
     }
 
     return this;
