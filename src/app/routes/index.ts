@@ -7,6 +7,7 @@ import { MessageRoutes } from "../modules/message/message.route";
 import { NotificationRoutes } from "../modules/notification/notification.route";
 import { TaskRoutes } from "../modules/task/task.route";
 import { categoryRoutes } from "../modules/category/category.route";
+import { CommentRoutes } from "../modules/comment/commnet.route";
 
 
 const router = express.Router()
@@ -23,6 +24,8 @@ router.use("/notification", NotificationRoutes)
 router.use("/task", TaskRoutes)
 
 router.use("/category", categoryRoutes)
+
+router.use("/comment", CommentRoutes)
 
 export default router;
 
