@@ -9,6 +9,7 @@ import { globalRateLimiter } from './app/middlewares/rateLimiter';
 import config       from './config';
 // import { StripeController } from './app/modules/stripe/stripe.controller';
 import passport     from './config/passport';
+import { setupSwagger } from './swagger';
 
 const app: Application = express();
 
@@ -61,6 +62,9 @@ app.get('/', (_req: Request, res: Response) => {
 
 //  API Routes
 app.use('/api/v1', router);
+
+// Swagger Documentation
+setupSwagger(app);
 
 //  404 Handler 
 app.use((req: Request, res: Response) => {
