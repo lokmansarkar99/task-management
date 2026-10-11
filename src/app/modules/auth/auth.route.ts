@@ -14,15 +14,38 @@ const router = express.Router();
 router
 .route("/register")
 .post(
-validateRequest(AuthValidation.createRegisterZodSchema),
-AuthController.registerUser
+  /*  #swagger.tags = ['Auth']
+      #swagger.summary = 'Register a new user'
+      #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'User registration data',
+          required: true,
+          schema: {
+              email: "john@example.com",
+              password: "password123",
+              name: "John Doe"
+          }
+      } 
+  */
+  validateRequest(AuthValidation.createRegisterZodSchema),
+  AuthController.registerUser
 );
 
 router
 .route("/login")
 .post(
-validateRequest(AuthValidation.createLoginZodSchema),
-AuthController.loginUser
+  /*  #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'User login credentials',
+          required: true,
+          schema: {
+              email: "john@example.com",
+              password: "password123"
+          }
+      } 
+  */
+  validateRequest(AuthValidation.createLoginZodSchema),
+  AuthController.loginUser
 );
 
 router

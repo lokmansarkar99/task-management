@@ -7,13 +7,13 @@
   },
   "servers": [
     {
-      "url": "/api/v1",
+      "url": "/",
       "description": "Current Server"
     }
   ],
   "paths": {
-    "/auth/register": {
-      "post": {
+    "/": {
+      "get": {
         "description": "",
         "responses": {
           "default": {
@@ -22,9 +22,38 @@
         }
       }
     },
-    "/auth/login": {
+    "/api/v1/auth/register": {
       "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User registration data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "john@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "John Doe"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
@@ -32,17 +61,54 @@
         }
       }
     },
-    "/auth/refresh-token": {
+    "/api/v1/auth/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User login credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "john@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh-token": {
       "post": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
       "post": {
         "description": "",
         "parameters": [
@@ -58,70 +124,91 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/send-otp": {
+    "/api/v1/auth/send-otp": {
       "post": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/verify-user": {
+    "/api/v1/auth/verify-user": {
       "post": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/reset-password": {
+    "/api/v1/auth/reset-password": {
       "post": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/google": {
+    "/api/v1/auth/google": {
       "get": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/google/callback": {
+    "/api/v1/auth/google/callback": {
       "get": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/auth/google/success": {
+    "/api/v1/auth/google/success": {
       "get": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Auth"
+        ]
       }
     },
-    "/user/my-profile": {
+    "/api/v1/user/my-profile": {
       "get": {
         "description": "",
         "parameters": [
@@ -137,7 +224,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       },
       "patch": {
         "description": "",
@@ -154,10 +244,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/users": {
+    "/api/v1/user/users": {
       "get": {
         "description": "",
         "parameters": [
@@ -201,10 +294,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/users/{id}": {
+    "/api/v1/user/users/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -228,7 +324,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       },
       "delete": {
         "description": "",
@@ -253,10 +352,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/users/{id}/status": {
+    "/api/v1/user/users/{id}/status": {
       "patch": {
         "description": "",
         "parameters": [
@@ -280,10 +382,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/users/{id}/block": {
+    "/api/v1/user/users/{id}/block": {
       "patch": {
         "description": "",
         "parameters": [
@@ -307,10 +412,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/providers": {
+    "/api/v1/user/providers": {
       "get": {
         "description": "",
         "parameters": [
@@ -326,10 +434,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/clients": {
+    "/api/v1/user/clients": {
       "get": {
         "description": "",
         "parameters": [
@@ -345,10 +456,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/user/all": {
+    "/api/v1/user/all": {
       "get": {
         "description": "",
         "parameters": [
@@ -392,20 +506,26 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/message/": {
+    "/api/v1/message/": {
       "post": {
         "description": "",
         "responses": {
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/message/read-all/{conversationId}": {
+    "/api/v1/message/read-all/{conversationId}": {
       "patch": {
         "description": "",
         "parameters": [
@@ -422,10 +542,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/message/{conversationId}/pinned": {
+    "/api/v1/message/{conversationId}/pinned": {
       "get": {
         "description": "",
         "parameters": [
@@ -442,10 +565,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/message/{conversationId}": {
+    "/api/v1/message/{conversationId}": {
       "get": {
         "description": "",
         "parameters": [
@@ -462,10 +588,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/message/{id}/pin": {
+    "/api/v1/message/{id}/pin": {
       "patch": {
         "description": "",
         "parameters": [
@@ -482,10 +611,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/message/{id}": {
+    "/api/v1/message/{id}": {
       "delete": {
         "description": "",
         "parameters": [
@@ -502,10 +634,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Message"
+        ]
       }
     },
-    "/notification/my": {
+    "/api/v1/notification/my": {
       "get": {
         "description": "",
         "parameters": [
@@ -521,10 +656,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Notification"
+        ]
       }
     },
-    "/notification/unread-count": {
+    "/api/v1/notification/unread-count": {
       "get": {
         "description": "",
         "parameters": [
@@ -540,10 +678,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Notification"
+        ]
       }
     },
-    "/notification/read-all": {
+    "/api/v1/notification/read-all": {
       "patch": {
         "description": "",
         "parameters": [
@@ -559,10 +700,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Notification"
+        ]
       }
     },
-    "/notification/{id}/read": {
+    "/api/v1/notification/{id}/read": {
       "patch": {
         "description": "",
         "parameters": [
@@ -586,155 +730,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Notification"
+        ]
       }
     },
-    "/notification/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/task/": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/task/scheduled": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/task/overdue": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/task/bulk-status": {
-      "patch": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/task/{id}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
+    "/api/v1/notification/{id}": {
       "delete": {
         "description": "",
         "parameters": [
@@ -758,62 +760,13 @@
           "default": {
             "description": ""
           }
-        }
-      },
-      "patch": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
+        },
+        "tags": [
+          "Notification"
+        ]
       }
     },
-    "/task/{id}/status": {
-      "patch": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/category/": {
+    "/api/v1/task/": {
       "get": {
         "description": "",
         "parameters": [
@@ -829,7 +782,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Task"
+        ]
       },
       "post": {
         "description": "",
@@ -846,10 +802,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Task"
+        ]
       }
     },
-    "/category/getwithtask": {
+    "/api/v1/task/scheduled": {
       "get": {
         "description": "",
         "parameters": [
@@ -865,10 +824,237 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Task"
+        ]
       }
     },
-    "/category/{slug}": {
+    "/api/v1/task/overdue": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      }
+    },
+    "/api/v1/task/bulk-status": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      }
+    },
+    "/api/v1/task/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      },
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      }
+    },
+    "/api/v1/task/{id}/status": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Task"
+        ]
+      }
+    },
+    "/api/v1/category/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/v1/category/getwithtask": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/v1/category/{slug}": {
       "get": {
         "description": "",
         "parameters": [
@@ -892,10 +1078,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Category"
+        ]
       }
     },
-    "/category/{id}": {
+    "/api/v1/category/{id}": {
       "patch": {
         "description": "",
         "parameters": [
@@ -919,10 +1108,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Category"
+        ]
       }
     },
-    "/category/{id}/toggle": {
+    "/api/v1/category/{id}/toggle": {
       "patch": {
         "description": "",
         "parameters": [
@@ -946,10 +1138,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Category"
+        ]
       }
     },
-    "/comment/task/{taskId}": {
+    "/api/v1/comment/task/{taskId}": {
       "get": {
         "description": "",
         "parameters": [
@@ -973,7 +1168,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       },
       "post": {
         "description": "",
@@ -998,10 +1196,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       }
     },
-    "/comment/{parentId}/reply": {
+    "/api/v1/comment/{parentId}/reply": {
       "post": {
         "description": "",
         "parameters": [
@@ -1025,10 +1226,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       }
     },
-    "/comment/{commentId}/like": {
+    "/api/v1/comment/{commentId}/like": {
       "post": {
         "description": "",
         "parameters": [
@@ -1052,10 +1256,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       }
     },
-    "/comment/{commentId}": {
+    "/api/v1/comment/{commentId}": {
       "delete": {
         "description": "",
         "parameters": [
@@ -1079,7 +1286,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       },
       "patch": {
         "description": "",
@@ -1104,10 +1314,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Comment"
+        ]
       }
     },
-    "/stats/my-tasks": {
+    "/api/v1/stats/my-tasks": {
       "get": {
         "description": "",
         "parameters": [
@@ -1123,10 +1336,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     },
-    "/stats/priority": {
+    "/api/v1/stats/priority": {
       "get": {
         "description": "",
         "parameters": [
@@ -1142,10 +1358,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     },
-    "/stats/by-category": {
+    "/api/v1/stats/by-category": {
       "get": {
         "description": "",
         "parameters": [
@@ -1161,10 +1380,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     },
-    "/stats/daily-activity": {
+    "/api/v1/stats/daily-activity": {
       "get": {
         "description": "",
         "parameters": [
@@ -1180,10 +1402,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     },
-    "/stats/overdue": {
+    "/api/v1/stats/overdue": {
       "get": {
         "description": "",
         "parameters": [
@@ -1199,10 +1424,13 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     },
-    "/stats/admin-dashboard": {
+    "/api/v1/stats/admin-dashboard": {
       "get": {
         "description": "",
         "parameters": [
@@ -1218,7 +1446,10 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Stats"
+        ]
       }
     }
   },

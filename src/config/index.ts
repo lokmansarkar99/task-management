@@ -5,11 +5,17 @@ import path from "path"
 
 dotenv.config({path: path.join(process.cwd(), ".env") })
 
+const clientUrls: string[] = (process.env.CLIENT_URL || '')
+    .split(',')
+    .map((url) => url.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
 export default {
     port: process.env.PORT,
     database_url: process.env.DATABASE_URL,
     node_env: process.env.NODE_ENV,
-    client_url: process.env.CLIENT_URL,
+    client_url: clientUrls[0] || process.env.CLIENT_URL || '',
+    client_urls: clientUrls,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
     jwt: {
         jwt_secret: process.env.JWT_SECRET,

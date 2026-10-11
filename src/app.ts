@@ -21,14 +21,10 @@ app.use(Morgan.errorHandler);
 app.use(globalRateLimiter);
 
 //  CORS
-// Updated to array to support multiple origins 
+// Support single or multiple origins configured via CLIENT_URL in .env
 app.use(
   cors({
-    origin: [
-      config.client_url as string,
-      'http://localhost:3000',
-      'http://localhost:5173',
-    ].filter(Boolean),
+    origin: config.client_urls,
     credentials: true,
   }),
 );
