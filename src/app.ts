@@ -13,6 +13,9 @@ import { setupSwagger } from './swagger';
 
 const app: Application = express();
 
+// Trust reverse proxy (e.g. Nginx) so rate limiter receives correct client IP
+app.set("trust proxy", 1);
+
 // Logger 
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
