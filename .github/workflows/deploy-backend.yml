@@ -1,0 +1,77 @@
+name: Deploy Task Management Backend to EC2
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch: {}
+
+concurrency:
+  group: task-management-backend-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Verify build output
+        run: test -f dist/server.js
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Deploy to EC2 over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            set -eu
+
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            cd /home/lokman/projects/task-management
+
+            echo "Fetching source..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Installing dependencies..."
+            npm ci
+
+            echo "Building backend..."
+            NODE_OPTIONS="--max-old-space-size=1024" npm run build
+            test -f dist/server.js
+
+            echo "Reloading PM2..."
+            pm2 startOrReload ecosystem.config.cjs --update-env
+            pm2 save
+
+            echo "Checking application..."
+            pm2 status
+            pm2 logs task-management-api --lines 30 --nostream
